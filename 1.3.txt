@@ -1,0 +1,68 @@
+const int pirPin = 2;    
+const int ledPin = 13;  
+const int buttonPin = 7;
+
+#define TEMP_SENSOR_PIN A2  
+#define LED_PIN 13          
+
+void setup() {
+  Serial.begin(9600);
+  pinMode(pirPin, INPUT);
+  pinMode(ledPin, OUTPUT);
+  pinMode(buttonPin, INPUT_PULLUP);
+}
+
+void loop() {
+  int motionSensorValue = digitalRead(pirPin);
+  int buttonState = digitalRead(buttonPin);
+
+  delay(2000);  
+
+  int sensorValue = analogRead(TEMP_SENSOR_PIN);
+
+  float voltage = sensorValue * (5.0 / 1023.0);
+  float temperature = (voltage - 0.5) * 100.0;
+
+  // To check the state of button
+  if (buttonState != LOW) {
+    Serial.print("Temperature: ");
+    Serial.println(temperature);
+  }
+
+  if (buttonState == LOW) {
+    blinkLED();
+  } else {
+    // To check the motion sensor
+    if (motionSensorValue == HIGH) {
+      
+      digitalWrite(ledPin, HIGH);
+      Serial.println("Motion: Detected, LED: ON");
+    } else {
+      
+      digitalWrite(ledPin, LOW);
+      Serial.println("Motion: Not Detected, LED: OFF");
+    }
+
+    // To check the readings by temp sensor
+    if (buttonState != LOW) {
+      if (temperature > 25.0) {
+        Serial.println("Temperature more than 25 degree celsius");
+        digitalWrite(LED_PIN, HIGH);  
+      } else {
+        Serial.println("Temperature less than 25 degree celsius");
+        digitalWrite(LED_PIN, LOW);   
+      }
+    }
+  }
+
+  delay(1000); 
+}
+
+void blinkLED() {          // LED blink function which calls up when we press the button 
+  for (int i = 0; i < 2; i++) {
+    digitalWrite(ledPin, HIGH);
+    delay(500);
+    digitalWrite(ledPin, LOW);
+    delay(500);
+  }
+}
